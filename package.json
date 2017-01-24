@@ -5,7 +5,7 @@
   "main": "index.js",
   "port": 8087,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha -w **/*-test.js",
     "dev": "supervisor index.js",
     "start": "node index.js"
   },
@@ -18,6 +18,8 @@
     "reselect": "^2.5.4"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
     "supervisor": "^0.12.0"
   }
 }

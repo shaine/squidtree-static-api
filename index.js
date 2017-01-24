@@ -42,7 +42,12 @@ app.use(function logger(req, res, next) {
 app.get('/', function index(req, res, next) {
     res.hal({
         links: {
-            self: `${root}/`
+            self: `${root}/`,
+            search: {
+                url: `${root}/search{?term}`,
+                rel: 'search',
+                templated: true
+            }
         }
     });
 });
@@ -105,14 +110,18 @@ app.get('/link/:linkId', function link(req, res, next) {
 
 app.use(function handle404(req, res) {
     res.status(404).hal({
-        error: 'Not found'
+        data: {
+            error: 'Not found'
+        }
     });
 });
 
 app.use(function handleException(err, req, res, next) {
     log.error(err.stack)
     res.status(500).hal({
-        error: 'Internal server error'
+        data: {
+            error: 'Internal server error'
+        }
     });
 });
 
