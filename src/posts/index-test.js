@@ -44,17 +44,23 @@ describe('posts', () => {
 
         it('gets this first page of posts', () => {
             expect(getPostsByPage(state, 0, 2))
-                .to.eql([posts[0], posts[1]]);
+                .to.eql([
+                    getDenormalizedPost(state, posts[0]),
+                    getDenormalizedPost(state, posts[1])
+                ]);
         });
 
         it('gets the second page of posts', () => {
             expect(getPostsByPage(state, 1, 2))
-                .to.eql([posts[2], posts[3]]);
+                .to.eql([
+                    getDenormalizedPost(state, posts[2]),
+                    getDenormalizedPost(state, posts[3])
+                ]);
         });
 
         it('gets the default number of posts', () => {
             expect(getPostsByPage(state, 0))
-                .to.eql(posts.slice(0, 20));
+                .to.eql(posts.slice(0, 20).map(post => getDenormalizedPost(state, post)));
         });
     });
 });

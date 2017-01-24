@@ -1,8 +1,12 @@
 const expect = require('chai').expect;
 const {
     getComments,
-    getCommentsByPostId
+    getCommentsByPostId,
+    getDenormalizedComment
 } = require('./index');
+const {
+    getUserById
+} = require('../users');
 const state = require('../../testDb.json');
 
 describe('comments', () => {
@@ -21,12 +25,28 @@ describe('comments', () => {
         });
     });
 
+    describe('getDenormalizedComment', () => {
+        it('denormalizes a comment entity', () => {
+            expect(getDenormalizedComment(state, {
+                id: 1,
+                user_id: 1
+            })).to.eql({
+                id: 1,
+                user_id: 1,
+                user: getUserById(state, 1)
+            });
+        });
+    });
+
     describe('getCommentsByPostId', () => {
         const comments = getComments(state);
 
         it('gets comments by post ID', () => {
             expect(getCommentsByPostId(state, 1))
-                .to.eql([comments[0], comments[2]]);
+                .to.eql([
+                    getDenormalizedComment(state, comments[0]),
+                    getDenormalizedComment(state, comments[2])
+                ]);
         });
     });
 });

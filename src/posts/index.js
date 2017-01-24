@@ -24,13 +24,16 @@ const getDenormalizedPost = createSelector(
 exports.getDenormalizedPost = getDenormalizedPost;
 
 const getPostsByPage = createSelector(
+    state => state,
     getPosts,
     (state, page) => page,
     (state, page, size) => size,
-    (posts, page, size = DEFAULT_PAGE_SIZE) => {
+    (state, posts, page, size = DEFAULT_PAGE_SIZE) => {
         const offset = page * size;
 
-        return posts.slice(offset, offset + size);
+        return posts
+            .slice(offset, offset + size)
+            .map(post => getDenormalizedPost(state, post));
     }
 );
 exports.getPostsByPage = getPostsByPage;
