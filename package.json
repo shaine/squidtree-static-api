@@ -1,0 +1,17 @@
+{
+  "name": "squidtree-static-api",
+  "version": "0.0.1",
+  "description": "Simple API wrapper around a JSON DB",
+  "main": "index.js",
+  "port": 8087,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Shaine Hatch <shaine@squidtree.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bunyan": "^1.8.5",
+    "express": "^4.14.0",
+    "reselect": "^2.5.4"
+  }
+}
