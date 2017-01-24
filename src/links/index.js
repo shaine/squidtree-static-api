@@ -4,4 +4,4 @@ const getLinks = createSelector(
     state => state,
     state => state.links
 );
-exports._getLinks = getLinks;
+exports.getLinks = getLinks;

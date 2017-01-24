@@ -1,14 +1,14 @@
 const expect = require('chai').expect;
 const {
-    _getUsers,
-    _getUserById
+    getUsers,
+    getUserById
 } = require('./index');
 const state = require('../../testDb.json');
 
 describe('users', () => {
     describe('getUsers', () => {
         it('gets the list of all users', () => {
-            expect(_getUsers(state))
+            expect(getUsers(state))
                 .to.exist
                 .to.equal(state.users);
         });
@@ -16,7 +16,7 @@ describe('users', () => {
 
     describe('getUserById', () => {
         it('gets a user by ID', () => {
-            expect(_getUserById(state, 3))
+            expect(getUserById(state, 3))
                 .to.exist
                 .to.equal(state.users[1]);
         });
