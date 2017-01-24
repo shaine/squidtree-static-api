@@ -9,6 +9,7 @@ describe('posts', () => {
     describe('getPosts', () => {
         it('gets the list of all posts', () => {
             expect(_getPosts(state))
+                .to.exist
                 .to.equal(state.posts);
         });
     });
@@ -26,7 +27,7 @@ describe('posts', () => {
 
         it('gets the default number of posts', () => {
             expect(_getPostsByPage(state, 0))
-                .to.eql(state.posts.slice(0, 19));
+                .to.eql(state.posts.slice(0, 20));
         });
     });
 });
