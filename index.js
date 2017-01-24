@@ -3,11 +3,15 @@ const Express = require('express');
 const http = require('http');
 const pkg = require('./package');
 const bunyan = require('bunyan');
+const hal = require('express-hal');
 
 const __DEVELOPMENT__ = process.env.NODE_ENV !== 'production';
 const log = bunyan.createLogger({
     name: pkg.name
 });
+const root = __DEVELOPMENT__ ?
+    `http://localhost:${pkg.port}` :
+    'https://bedlam.squidtree.com';
 
 let db;
 try {
@@ -18,6 +22,8 @@ try {
 
 const app = new Express();
 const server = new http.Server(app);
+
+app.use(hal.middleware);
 
 app.use(function logger(req, res, next) {
     function afterResponse() {
@@ -33,37 +39,81 @@ app.use(function logger(req, res, next) {
     next();
 });
 
-app.use('/', function index(req, res, next) {
+app.get('/', function index(req, res, next) {
+    res.hal({
+        links: {
+            self: `${root}/`
+        }
+    });
 });
 
-app.use('/search', function search(req, res, next) {
+app.get('/search', function search(req, res, next) {
+    res.hal({
+        links: {
+            self: `${root}/search`
+        }
+    });
 });
 
-app.use('/posts', function posts(req, res, next) {
+app.get('/posts', function posts(req, res, next) {
+    res.hal({
+        links: {
+            self: `${root}/posts`
+        }
+    });
 });
 
-app.use('/post/:postId', function post(req, res, next) {
+app.get('/post/:postId', function post(req, res, next) {
+    res.hal({
+        links: {
+            self: `${root}/post`
+        }
+    });
 });
 
-app.use('/users', function users(req, res, next) {
+app.get('/users', function users(req, res, next) {
+    res.hal({
+        links: {
+            self: `${root}/users`
+        }
+    });
 });
 
-app.use('/user/:userId', function user(req, res, next) {
+app.get('/user/:userId', function user(req, res, next) {
+    res.hal({
+        links: {
+            self: `${root}/user`
+        }
+    });
 });
 
-app.use('/links', function links(req, res, next) {
+app.get('/links', function links(req, res, next) {
+    res.hal({
+        links: {
+            self: `${root}/links`
+        }
+    });
 });
 
-app.use('/link/:linkId', function link(req, res, next) {
+app.get('/link/:linkId', function link(req, res, next) {
+    res.hal({
+        links: {
+            self: `${root}/link`
+        }
+    });
 });
 
 app.use(function handle404(req, res) {
-    res.status(404).send('Not found');
+    res.status(404).hal({
+        error: 'Not found'
+    });
 });
 
 app.use(function handleException(err, req, res, next) {
     log.error(err.stack)
-    res.status(500).send('Internal exception');
+    res.status(500).hal({
+        error: 'Internal server error'
+    });
 });
 
 server.listen(pkg.port, err => {

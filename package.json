@@ -5,13 +5,19 @@
   "main": "index.js",
   "port": 8087,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "supervisor index.js",
+    "start": "node index.js"
   },
   "author": "Shaine Hatch <shaine@squidtree.com>",
   "license": "MIT",
   "dependencies": {
     "bunyan": "^1.8.5",
     "express": "^4.14.0",
+    "express-hal": "0.0.1",
     "reselect": "^2.5.4"
+  },
+  "devDependencies": {
+    "supervisor": "^0.12.0"
   }
 }
