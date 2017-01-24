@@ -18,7 +18,10 @@ describe('users', () => {
         it('gets a user by ID', () => {
             expect(getUserById(state, 3))
                 .to.exist
-                .to.equal(state.users[1]);
+                .to.eql({
+                    id: 3,
+                    handle: 'barbaz'
+                });
         });
     });
 });

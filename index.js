@@ -6,9 +6,15 @@ const bunyan = require('bunyan');
 const hal = require('express-hal');
 const {
     getPostById,
-    getPostsByPage,
+    getPostsByUserId,
     getPostsHasNextPage
 } = require('./src/posts');
+const {
+    getUserById
+} = require('./src/users');
+const {
+    getContentByUserId,
+} = require('./src/content');
 
 const __DEVELOPMENT__ = process.env.NODE_ENV !== 'production';
 const log = bunyan.createLogger({
@@ -63,6 +69,12 @@ function getLinksForPost(post) {
     };
 }
 
+function getLinksForUser(user) {
+    return {
+        self: `${root}/user/${user.id}`
+    };
+}
+
 app.get('/', function index(req, res, next) {
     res.hal({
         links: {
@@ -84,10 +96,10 @@ app.get('/search', function search(req, res, next) {
 app.get('/posts', function posts(req, res, next) {
     const page = parseInt(req.query.page, 10) || 0;
     const hasNextPage = getPostsHasNextPage(db, page);
-    const posts = getPostsByPage(db, page);
+    const posts = getContentByUserId(db, page);
 
     if (!posts.length) {
-        next();
+        return next();
     }
 
     let queryParams = '';
@@ -123,7 +135,10 @@ app.get('/posts', function posts(req, res, next) {
         links,
         data: {
             posts: posts.map(post => Object.assign({}, post, {
-                links: getLinksForPost(post)
+                links: getLinksForPost(post),
+                user: Object.assign({}, post.user, {
+                    links: getLinksForUser(post.user)
+                })
             }))
         }
     });
@@ -134,13 +149,18 @@ app.get('/post/:postId', function post(req, res, next) {
     const post = getPostById(db, postId);
 
     if (!post) {
-        next();
+        return next();
     }
+
+    const linkedPost = Object.assign({}, post);
+    linkedPost.user = Object.assign({}, post.user, {
+        links: getLinksForUser(post.user)
+    });
 
     res.hal({
         links: getLinksForPost(post),
         data: {
-            post
+            post: linkedPost
         }
     });
 });
@@ -154,9 +174,19 @@ app.get('/users', function users(req, res, next) {
 });
 
 app.get('/user/:userId', function user(req, res, next) {
+    const userId = parseInt(req.params.userId, 10);
+    const user = getUserById(db, userId);
+    const posts = getPostsByUserId(db, userId);
+
+    if (!user) {
+        return next();
+    }
+
     res.hal({
-        links: {
-            self: `${root}/user`
+        links: getLinksForUser(user),
+        data: {
+            user,
+            posts
         }
     });
 });
@@ -178,19 +208,15 @@ app.get('/link/:linkId', function link(req, res, next) {
 });
 
 app.use(function handle404(req, res) {
-    res.status(404).hal({
-        data: {
-            error: 'Not found'
-        }
+    res.status(404).json({
+        error: 'Not found'
     });
 });
 
 app.use(function handleException(err, req, res, next) {
     log.error(err.stack)
-    res.status(500).hal({
-        data: {
-            error: 'Internal server error'
-        }
+    res.status(500).json({
+        error: 'Internal server error'
     });
 });
 
