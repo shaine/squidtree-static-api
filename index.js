@@ -4,6 +4,11 @@ const http = require('http');
 const pkg = require('./package');
 const bunyan = require('bunyan');
 const hal = require('express-hal');
+const {
+    getPostById,
+    getPostsByPage,
+    getPostsHasNextPage
+} = require('./src/posts');
 
 const __DEVELOPMENT__ = process.env.NODE_ENV !== 'production';
 const log = bunyan.createLogger({
@@ -39,15 +44,31 @@ app.use(function logger(req, res, next) {
     next();
 });
 
+const searchLink = {
+    href: `${root}/search{?term}`,
+    rel: 'search',
+    templated: true
+};
+
+const postsLink = {
+    href: `${root}/posts{?page}`,
+    rel: 'posts',
+    templated: true
+};
+
+function getLinksForPost(post) {
+    return {
+        self: `${root}/post/${post.id}`,
+        posts: postsLink
+    };
+}
+
 app.get('/', function index(req, res, next) {
     res.hal({
         links: {
             self: `${root}/`,
-            search: {
-                url: `${root}/search{?term}`,
-                rel: 'search',
-                templated: true
-            }
+            search: searchLink,
+            posts: postsLink
         }
     });
 });
@@ -61,17 +82,65 @@ app.get('/search', function search(req, res, next) {
 });
 
 app.get('/posts', function posts(req, res, next) {
+    const page = parseInt(req.query.page, 10) || 0;
+    const hasNextPage = getPostsHasNextPage(db, page);
+    const posts = getPostsByPage(db, page);
+
+    if (!posts.length) {
+        next();
+    }
+
+    let queryParams = '';
+    if (page) {
+        queryParams += `page=${page}`;
+    }
+    if (queryParams) {
+        queryParams = `?${queryParams}`;
+    }
+
+    const links = {
+        self: `${root}/posts${queryParams}`,
+        posts: postsLink
+    };
+
+    if (getPostsHasNextPage(db, page)) {
+        links.next = {
+            href: `${root}/posts?page=${page + 1}`,
+            rel: 'nextPosts'
+        };
+    }
+
+    if (page) {
+        const prevPage = page - 1;
+        const prevQueryParams = prevPage ? `?page=${prevPage}` : '';
+        links.previous = {
+            href: `${root}/posts${prevQueryParams}`,
+            rel: 'previousPosts'
+        };
+    }
+
     res.hal({
-        links: {
-            self: `${root}/posts`
+        links,
+        data: {
+            posts: posts.map(post => Object.assign({}, post, {
+                links: getLinksForPost(post)
+            }))
         }
     });
 });
 
 app.get('/post/:postId', function post(req, res, next) {
+    const postId = parseInt(req.params.postId, 10);
+    const post = getPostById(db, postId);
+
+    if (!post) {
+        next();
+    }
+
     res.hal({
-        links: {
-            self: `${root}/post`
+        links: getLinksForPost(post),
+        data: {
+            post
         }
     });
 });

@@ -1,8 +1,10 @@
 const expect = require('chai').expect;
 const {
     getDenormalizedPost,
+    getPostById,
     getPosts,
-    getPostsByPage
+    getPostsByPage,
+    getPostsHasNextPage
 } = require('./index');
 const {
     getCommentsByPostId
@@ -39,6 +41,20 @@ describe('posts', () => {
         });
     });
 
+    describe('getPostById', () => {
+        const posts = getPosts(state);
+
+        it('returns a post by its ID', () => {
+            expect(getPostById(state, 3))
+                .to.eql(getDenormalizedPost(state, posts[2]));
+        });
+
+        it('returns undefined if a post is not found', () => {
+            expect(getPostById(state, 'foobar'))
+                .to.be.null;
+        });
+    });
+
     describe('getPostsByPage', () => {
         const posts = getPosts(state);
 
@@ -61,6 +77,32 @@ describe('posts', () => {
         it('gets the default number of posts', () => {
             expect(getPostsByPage(state, 0))
                 .to.eql(posts.slice(0, 20).map(post => getDenormalizedPost(state, post)));
+        });
+    });
+
+    describe('getPostsHasNextPage', () => {
+        it('returns true if posts size is bigger than end of page', () => {
+            const arr = [];
+            arr.length = 6;
+
+            expect(getPostsHasNextPage.resultFunc(arr, 0, 5))
+                .to.be.true;
+        });
+
+        it('returns false if posts size is less than the end of page', () => {
+            const arr = [];
+            arr.length = 3;
+
+            expect(getPostsHasNextPage.resultFunc(arr, 0, 5))
+                .to.be.false;
+        });
+
+        it('returns false if posts size is equal to the end of page', () => {
+            const arr = [];
+            arr.length = 10;
+
+            expect(getPostsHasNextPage.resultFunc(arr, 1, 5))
+                .to.be.false;
         });
     });
 });

@@ -23,6 +23,22 @@ const getDenormalizedPost = createSelector(
 );
 exports.getDenormalizedPost = getDenormalizedPost;
 
+const getPostById = createSelector(
+    state => state,
+    getPosts,
+    (state, postId) => postId,
+    (state, posts, postId) => {
+        const post = posts.find(post => post.id === postId);
+
+        if (post) {
+            return getDenormalizedPost(state, post);
+        }
+
+        return null;
+    }
+);
+exports.getPostById = getPostById;
+
 const getPostsByPage = createSelector(
     state => state,
     getPosts,
@@ -33,7 +49,18 @@ const getPostsByPage = createSelector(
 
         return posts
             .slice(offset, offset + size)
-            .map(post => getDenormalizedPost(state, post));
+            .map(post => post.id)
+            .map(postId => getPostById(state, postId));
     }
 );
 exports.getPostsByPage = getPostsByPage;
+
+const getPostsHasNextPage = createSelector(
+    getPosts,
+    (state, page) => page,
+    (state, page, size) => size,
+    (posts, page, size = DEFAULT_PAGE_SIZE) => {
+        return posts.length > (page + 1) * size;
+    }
+);
+exports.getPostsHasNextPage = getPostsHasNextPage;
