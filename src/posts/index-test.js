@@ -5,9 +5,9 @@ const {
     getPosts,
     getPostsByPage,
     getPostsHasNextPage
-} = require('./index');
+} = require('.');
 const {
-    getCommentsByPostId
+    getPostCommentsById
 } = require('../comments');
 const {
     getUserById
@@ -36,7 +36,7 @@ describe('posts', () => {
                 id: 1,
                 user_id: 1,
                 user: getUserById(state, 1),
-                comments: getCommentsByPostId(state, 1)
+                comments: getPostCommentsById(state, 1)
             });
         });
     });

@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
 const {
     sortByCreatedAt
-} = require('./index');
+} = require('.');
 
 describe('helpers', () => {
     describe('sortByCreatedAt', () => {

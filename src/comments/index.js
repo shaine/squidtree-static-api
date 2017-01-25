@@ -17,12 +17,22 @@ const getDenormalizedComment = createSelector(
 );
 exports.getDenormalizedComment = getDenormalizedComment;
 
-const getCommentsByPostId = createSelector(
+const getPostCommentsById = createSelector(
     state => state,
     getComments,
     (state, postId) => postId,
     (state, comments, postId) => comments.filter(
-        comment => comment.post_id === postId
+        comment => comment.post_id === postId && comment.type === 'post'
     ).map(comment => getDenormalizedComment(state, comment))
 );
-exports.getCommentsByPostId = getCommentsByPostId;
+exports.getPostCommentsById = getPostCommentsById;
+
+const getLinkCommentsById = createSelector(
+    state => state,
+    getComments,
+    (state, postId) => postId,
+    (state, comments, postId) => comments.filter(
+        comment => comment.post_id === postId && comment.type === 'link'
+    ).map(comment => getDenormalizedComment(state, comment))
+);
+exports.getLinkCommentsById = getLinkCommentsById;

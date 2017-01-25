@@ -1,9 +1,10 @@
 const expect = require('chai').expect;
 const {
     getComments,
-    getCommentsByPostId,
+    getPostCommentsById,
+    getLinkCommentsById,
     getDenormalizedComment
-} = require('./index');
+} = require('.');
 const {
     getUserById
 } = require('../users');
@@ -38,14 +39,26 @@ describe('comments', () => {
         });
     });
 
-    describe('getCommentsByPostId', () => {
+    describe('getPostCommentsById', () => {
         const comments = getComments(state);
 
-        it('gets comments by post ID', () => {
-            expect(getCommentsByPostId(state, 1))
+        it('gets post comments by post ID', () => {
+            expect(getPostCommentsById(state, 1))
                 .to.eql([
                     getDenormalizedComment(state, comments[0]),
                     getDenormalizedComment(state, comments[2])
+                ]);
+        });
+    });
+
+    describe('getLinkCommentsById', () => {
+        const comments = getComments(state);
+
+        it('gets link comments by post ID', () => {
+            expect(getLinkCommentsById(state, 1))
+                .to.eql([
+                    getDenormalizedComment(state, comments[3]),
+                    getDenormalizedComment(state, comments[5])
                 ]);
         });
     });

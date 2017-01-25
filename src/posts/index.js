@@ -4,7 +4,7 @@ const {
     getUserById
 } = require('../users');
 const {
-    getCommentsByPostId
+    getPostCommentsById
 } = require('../comments');
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -18,7 +18,7 @@ exports.getPosts = getPosts;
 const getDenormalizedPost = createSelector(
     (state, post) => post,
     (state, post) => getUserById(state, post.user_id),
-    (state, post) => getCommentsByPostId(state, post.id),
+    (state, post) => getPostCommentsById(state, post.id),
     (post, user, comments) => Object.assign({}, post, { user }, { comments })
 );
 exports.getDenormalizedPost = getDenormalizedPost;

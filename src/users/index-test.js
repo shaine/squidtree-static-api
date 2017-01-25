@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const {
     getUsers,
     getUserById
-} = require('./index');
+} = require('.');
 const state = require('../../testDb.json');
 
 describe('users', () => {
